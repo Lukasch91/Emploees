@@ -1,28 +1,43 @@
 package com.lukas;
 
 import java.util.List;
+import java.util.Scanner;
 
 public class test {
 
 	public static void main(String[] args) {
 
-		Employee employee = new Employee(1, "Lukas", "Cholomskis", "Direktorius");
-		employee.requestHoliday(employee, "2016-01-01", "2016-02-01");
+		EmployeeDAO employeeDAO = new EmployeeDAO();
+		Employee employee;
+		Manager manager;
 
-		Manager manager = new Manager(2, "Tadas", "Petrauskas", "Manager");
-		manager.requestHoliday(manager, "2016-02-01", "2016-04-03");
+		Scanner reader = new Scanner(System.in);
+		boolean keepRunning = true;
+		while (keepRunning) {
 
-		System.out.println(employee.holidayRequestDAO.getNumberOfRequests());
+			System.out.println("Enter employee's ID");
+			int input = reader.nextInt();
 
-		List<Holiday> holidayList = manager.getRequests();
+			if (employeeDAO.isManager(input)) {
+				manager = (Manager) employeeDAO.getEmployee(input);
+				System.out.println("Welcome you are" + manager.getEmplId() + " " + manager.getFirstName() + " "
+						+ manager.getLastName() + " " + manager.getPosition());
 
-		for (Holiday holiday : holidayList) {
-			System.out.println(holiday.getHolidaysId() + " " + holiday.getFirstName() + " " + holiday.getLastname()
-					+ " " + holiday.getHolidaySince() + " " + holiday.getHolidayUntil() + " " + holiday.getStatus()
-					+ " " + holiday.getDaysOfHolidays());
+			} else {
+				employee = employeeDAO.getEmployee(input);
+				System.out.println("Welcome, you are " + employee.getEmplId() + " " + employee.getFirstName() + " "
+						+ employee.getLastName() + " " + employee.getPosition());
+				System.out.println("Choose : /n 1 - Request holiday /n 2 - Get my holiday plan");
+				String operation = reader.next();
+				if (operation.equals("1")) {
+					System.out.println("Input since : ");
+					String since = reader.next();
+					System.out.println("Input until : ");
+					String until = reader.next();
+					employee.requestHoliday(employee, since, until);
+				} else if (operation.equals("2")) {
+				}
+			}
 		}
-
-		Holiday holiday = holidayList.get(0);
-		manager.approveHoliday(holiday);
 	}
 }

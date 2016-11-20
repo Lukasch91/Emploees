@@ -14,7 +14,7 @@ public class Employee {
 		this.position = position;
 
 	}
-	
+
 	HolidayDAO holidayRequestDAO = new HolidayDAO();
 
 	public int getEmplId() {
@@ -34,9 +34,8 @@ public class Employee {
 	}
 
 	public void requestHoliday(Employee employee, String holidaySince, String holidayUntil) {
-		
+
 		holidayRequestDAO.addRequest(employee, holidaySince, holidayUntil);
-		
-		
+
 	}
 }

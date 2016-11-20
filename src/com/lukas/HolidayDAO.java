@@ -52,7 +52,32 @@ public class HolidayDAO {
 			String query = "SELECT HOLIDAY_REQUESTS.ID, EMPLOYEES.FIRSTNAME, EMPLOYEES.LASTNAME, "
 					+ "HOLIDAY_REQUESTS.SINCE, HOLIDAY_REQUESTS.UNTIL, HOLIDAY_REQUESTS.STATUS, HOLIDAY_REQUESTS.UNTIL-HOLIDAY_REQUESTS.SINCE AS DAYS"
 					+ " FROM EMPLOYEES LEFT OUTER JOIN EMP_HOL ON EMPLOYEES.EMP_ID =EMP_HOL.EMP_ID "
-					+ "LEFT OUTER JOIN HOLIDAY_REQUESTS ON EMP_HOL.HOL_ID=HOLIDAY_REQUESTS.ID;";
+					+ "LEFT OUTER JOIN HOLIDAY_REQUESTS ON EMP_HOL.HOL_ID=HOLIDAY_REQUESTS.ID WHERE STATUS IS NULL;";
+
+			try (PreparedStatement stmt = conn.prepareStatement(query)) {
+				ResultSet rs = stmt.executeQuery();
+				while (rs.next()) {
+					Holiday holiday = new Holiday(rs.getInt("ID"), rs.getString("FIRSTNAME"), rs.getString("LASTNAME"),
+							rs.getString("SINCE"), rs.getString("Until"), rs.getString("STATUS"), rs.getInt("DAYS"));
+					requestList.add(holiday);
+				}
+			}
+
+		} catch (SQLException ex) {
+			System.out.println(ex.getMessage());
+		}
+		return requestList;
+	}
+
+	public List<Holiday> getApprovedRequests() {
+
+		List<Holiday> requestList = new ArrayList<>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			String query = "SELECT HOLIDAY_REQUESTS.ID, EMPLOYEES.FIRSTNAME, EMPLOYEES.LASTNAME, "
+					+ "HOLIDAY_REQUESTS.SINCE, HOLIDAY_REQUESTS.UNTIL, HOLIDAY_REQUESTS.STATUS, HOLIDAY_REQUESTS.UNTIL-HOLIDAY_REQUESTS.SINCE AS DAYS"
+					+ " FROM EMPLOYEES LEFT OUTER JOIN EMP_HOL ON EMPLOYEES.EMP_ID =EMP_HOL.EMP_ID "
+					+ "LEFT OUTER JOIN HOLIDAY_REQUESTS ON EMP_HOL.HOL_ID=HOLIDAY_REQUESTS.ID WHERE STATUS IS NOT NULL;";
 
 			try (PreparedStatement stmt = conn.prepareStatement(query)) {
 				ResultSet rs = stmt.executeQuery();
@@ -95,13 +120,13 @@ public class HolidayDAO {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void approveHoliday(Holiday holiday) {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 
 			String sql = "UPDATE HOLIDAY_REQUESTS SET STATUS='A' WHERE ID=?";
-			
+
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
 			preparedStatement.setInt(1, holiday.getHolidaysId());
 			preparedStatement.execute();
@@ -111,5 +136,19 @@ public class HolidayDAO {
 		}
 	}
 
+	public void rejectHoliday(Holiday holiday) {
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+
+			String sql = "UPDATE HOLIDAY_REQUESTS SET STATUS='R' WHERE ID=?";
+
+			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, holiday.getHolidaysId());
+			preparedStatement.execute();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
 }

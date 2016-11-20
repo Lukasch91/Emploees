@@ -16,13 +16,11 @@ public class Manager extends Employee {
 	}
 
 	public void approveHoliday(Holiday holiday) {
-		
 		holidayDAO.approveHoliday(holiday);
-		
 	}
 
-	public void rejectHoliday() {
-
+	public void rejectHoliday(Holiday holiday) {
+		holidayDAO.rejectHoliday(holiday);
 	}
 
 }
